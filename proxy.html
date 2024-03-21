@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Web Browser</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: Arial, sans-serif;
+    }
+    #browser {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    #toolbar {
+        background-color: #f5f5f5;
+        padding: 10px;
+    }
+    #tabs {
+        display: flex;
+        gap: 10px;
+    }
+    .tab {
+        padding: 5px 10px;
+        background-color: #e0e0e0;
+        border-radius: 5px 5px 0 0;
+        cursor: pointer;
+    }
+    .tab.active {
+        background-color: #ffffff;
+    }
+    .tab .close {
+        margin-left: 5px;
+        cursor: pointer;
+    }
+    #content {
+        flex: 1;
+    }
+    iframe {
+        width: 100%;
+        height: calc(100% - 40px); /* Adjust according to the height of the toolbar */
+        border: none;
+        display: none; /* Hide all iframes by default */
+    }
+</style>
+</head>
+<body>
+<div id="browser">
+    <div id="toolbar">
+        <div id="tabs">
+            <div class="tab active" onclick="switchTab(0)">Tab 1<span class="close" onclick="closeTab(0)">x</span></div>
+        </div>
+        <button onclick="addTab()">+</button>
+    </div>
+    <div id="content">
+        <iframe id="iframe0" src="https://www.google.com"></iframe>
+    </div>
+</div>
+
+<script>
+    let tabCount = 1;
+
+    function addTab() {
+        const tabContainer = document.getElementById('tabs');
+        const newTab = document.createElement('div');
+        newTab.className = 'tab';
+        newTab.innerHTML = `Tab ${tabCount + 1}<span class="close" onclick="closeTab(${tabCount})">x</span>`;
+        newTab.addEventListener('click', () => switchTab(tabCount));
+        tabContainer.insertBefore(newTab, document.querySelector('#tabs button'));
+        
+        const newIframe = document.createElement('iframe');
+        newIframe.id = `iframe${tabCount}`;
+        newIframe.src = 'https://www.google.com';
+        document.getElementById('content').appendChild(newIframe);
+        
+        tabCount++;
+    }
+
+    function switchTab(tabIndex) {
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach((tab, index) => {
+            if (index === tabIndex) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+
+        const iframes = document.querySelectorAll('iframe');
+        iframes.forEach((iframe, index) => {
+            if (index === tabIndex) {
+                iframe.style.display = 'block';
+            } else {
+                iframe.style.display = 'none';
+            }
+        });
+    }
+
+    function closeTab(tabIndex) {
+        const tab = document.querySelector(`#tabs .tab:nth-child(${tabIndex + 1})`);
+        tab.parentNode.removeChild(tab);
+
+        const iframe = document.getElementById(`iframe${tabIndex}`);
+        iframe.parentNode.removeChild(iframe);
+
+        tabCount--;
+
+        switchTab(tabCount - 1);
+    }
+</script>
+</body>
+</html>
